@@ -1,0 +1,21 @@
+:root {
+  --primary: #e4e6eb;
+  --secondary: #0084ff;
+  --bg: #3a3b3c;
+}
+
+.App {
+  color: #fff;
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  overflow: hidden;
+  max-width: 1600px;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  height: 100%;
+  width: 100%;
+}
