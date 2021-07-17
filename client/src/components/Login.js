@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import WarningIcon from "@material-ui/icons/Warning";
 import axios from "../axios";
+import { selectUser, setLogin } from "../features/users/user";
+import { useDispatch, useSelector } from "react-redux";
+import { Redirect, useHistory } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,6 +14,23 @@ function Login() {
   const [error, setError] = useState("");
   const [profile, setProfile] = useState(false);
   const [image, setImage] = useState(null);
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const user = useSelector(selectUser);
+  const [emailExits, setEmailExits] = useState(false);
+
+  const checkEmail = (e) => {
+    if (register && e.target.value) {
+      console.log("sending");
+      axios
+        .get(`/check/email/${e.target.value}`)
+        .then((res) => setEmailExits(false))
+        .catch((err) => {
+          showError("Email already exits");
+          setEmailExits(true);
+        });
+    }
+  };
 
   const registerUser = () => {
     if (!name || !image || !email || !password) return;
@@ -39,7 +59,9 @@ function Login() {
         axios
           .post("/new/user", data)
           .then((res) => {
+            dispatch(setLogin(res.data));
             setProfile(false);
+            history.push("/");
           })
           .catch((err) => console.log(err));
       })
@@ -54,10 +76,17 @@ function Login() {
       return;
     }
 
-    if (password.length < 7) {
-      showError("Password is to short");
-      return;
-    }
+    axios
+      .post("/login", {
+        email: email,
+        password: password,
+      })
+      .then((res) => {
+        dispatch(setLogin(res.data));
+      })
+      .catch((error) => {
+        showError("Something went wrong");
+      });
   };
 
   const showError = (message) => {
@@ -77,6 +106,7 @@ function Login() {
 
   return (
     <Container>
+      {user && <Redirect to="/" />}
       <Content>
         {profile ? (
           <Profile>
@@ -131,6 +161,7 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
+                onBlur={checkEmail}
                 placeholder="Email address"
               />
               <input
@@ -141,6 +172,7 @@ function Login() {
               />
               {register ? (
                 <button
+                  disabled={emailExits ? true : false}
                   onClick={(e) => {
                     e.preventDefault();
                     if (!name || !email || !password) {
@@ -283,6 +315,11 @@ const Content = styled.div`
       font-size: 1.15rem;
       font-weight: bold;
       max-width: 100%;
+
+      &:disabled {
+        opacity: 0.7;
+        cursor: none;
+      }
     }
 
     a {

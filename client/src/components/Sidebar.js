@@ -5,12 +5,21 @@ import VideoCallIcon from "@material-ui/icons/VideoCall";
 import CreateIcon from "@material-ui/icons/Create";
 import SearchIcon from "@material-ui/icons/Search";
 import SidebarItem from "./SidebarItem";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/users/user";
 
 function Sidebar() {
+  const user = useSelector(selectUser);
+  console.log(user);
+
   return (
     <Container>
       <Top>
-        <h1>Chats</h1>
+        <Avatar
+          style={{
+            background: `url(${user?.currentUser.photoURL}) no-repeat center center/cover`,
+          }}
+        />
 
         <TopRight>
           <div>
@@ -53,6 +62,14 @@ const Container = styled.div`
   height: 100vh;
   padding: 1rem;
   border-right: 1px solid #393a3b;
+`;
+
+const Avatar = styled.div`
+  width: 100%;
+  max-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
 `;
 
 const Top = styled.div`

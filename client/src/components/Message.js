@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-function Message({ sender }) {
+function Message({ sender, message, profile }) {
   return (
     <Container
       style={
@@ -15,7 +15,7 @@ function Message({ sender }) {
     >
       <Avatar
         style={{
-          background: `url(https://images.unsplash.com/photo-1601455763557-db1bea8a9a5a?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60) no-repeat center center/cover`,
+          background: `url(${profile}) no-repeat center center/cover`,
         }}
       />
       <Content
@@ -25,12 +25,7 @@ function Message({ sender }) {
             : { background: " var(--bg)" }
         }
       >
-        <p>
-          Dear all, Virtual lab session of basic Electronics Engineering is
-          scheduled tomorrow at 2:45 pm... This session is for all three classes
-          FE-1,2,3. It's mandatory to attend session Link will be posted 10 min
-          before scheduled time on your classroom...
-        </p>
+        <p>{message}</p>
       </Content>
     </Container>
   );
@@ -51,14 +46,15 @@ const Content = styled.div`
   border-radius: 20px;
   font-size: 1rem;
   width: fit-content;
-  max-width: 300px;
+  max-width: 500px;
   background: var(--bg);
-  padding: 0.6em 1em;
+  padding: 0.7em 1em;
   height: 100%;
   margin-left: 0.5em;
 
   p {
     margin: 0;
+    line-height: 1.5;
   }
 `;
 

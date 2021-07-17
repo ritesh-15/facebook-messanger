@@ -22,5 +22,5 @@ const Container = styled.div`
   padding-bottom: 0;
   height: 100vh;
   display: grid;
-  grid-template-rows: 0.25fr 3fr 0.1fr;
+  grid-template-rows: 0.25fr 3fr 0.13fr;
 `;

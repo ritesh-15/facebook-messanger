@@ -52,6 +52,8 @@ router.post("/new/user", async (req, res) => {
     if (result) res.status(400).json({ error: "email id already exists" });
   });
 
+  console.log("Next");
+
   const hashedPass = await bcrypt.hash(password, 10);
 
   const data = {
@@ -66,7 +68,8 @@ router.post("/new/user", async (req, res) => {
   const user = await User.create(data);
 
   if (user) {
-    res.status(201).json({ message: user });
+    req.session.user = user;
+    res.status(201).json({ currentUser: user });
   }
 });
 
@@ -87,6 +90,53 @@ router.get("/profile/:filename", (req, res) => {
     }
 
     res.sendFile(dest);
+  });
+});
+
+// login route
+
+router.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!req.body.email || !req.body.password) res.status(400);
+
+  User.findOne({ emailId: email }, async (err, result) => {
+    if (result) {
+      const auth = await bcrypt.compare(password, result.password);
+
+      try {
+        if (auth) {
+          req.session.user = result;
+          res.json({ currentUser: result });
+        }
+      } catch (e) {
+        res.status(404).json({ error: "Email or password is wrong" });
+      }
+    }
+
+    res.statusCode = 404;
+    res.send("No user found");
+  });
+});
+
+router.get("/isUser", (req, res) => {
+  if (req.session.user) {
+    res.status(200).json({ currentUser: req.session.user });
+  }
+
+  res.status(404).json({ currentUser: null });
+});
+
+// check email
+
+router.get("/check/email/:email", (req, res) => {
+  User.exists({ emailId: req.params.email }, (err, result) => {
+    if (result) {
+      res.status(400).send("Email id already exits");
+    }
+    if (!result) {
+      res.status(200).send("Ok");
+    }
   });
 });
 
