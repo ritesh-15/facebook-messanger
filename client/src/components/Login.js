@@ -163,6 +163,11 @@ function Login() {
                 type="email"
                 onBlur={checkEmail}
                 placeholder="Email address"
+                style={
+                  emailExits
+                    ? { borderColor: "red" }
+                    : { borderColor: "#dddfe2" }
+                }
               />
               <input
                 value={password}
@@ -201,11 +206,13 @@ function Login() {
                     setName("");
                     setPassword("");
                     setRegister(false);
+                    setEmailExits(false);
                   } else {
                     setEmail("");
                     setName("");
                     setPassword("");
                     setRegister(true);
+                    setEmailExits(false);
                   }
                 }}
               >
@@ -299,7 +306,7 @@ const Content = styled.div`
       border-radius: 6px;
 
       &:focus-within {
-        border-color: #1877f2;
+        border-color: #1877f2 !important;
       }
     }
 

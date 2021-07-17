@@ -140,4 +140,9 @@ router.get("/check/email/:email", (req, res) => {
   });
 });
 
+router.get("/logout", (req, res) => {
+  req.logOut();
+  res.status(200);
+});
+
 export default router;

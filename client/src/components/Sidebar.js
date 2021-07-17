@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
 import CreateIcon from "@material-ui/icons/Create";
 import SearchIcon from "@material-ui/icons/Search";
 import SidebarItem from "./SidebarItem";
-import { useSelector } from "react-redux";
-import { selectUser } from "../features/users/user";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, setLogOut } from "../features/users/user";
+import { CloseOutlined } from "@material-ui/icons";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import axios from "../axios";
 
 function Sidebar() {
   const user = useSelector(selectUser);
-  console.log(user);
+  const dispatch = useDispatch();
+  const [showProfile, setShowProfile] = useState(false);
+
+  const logout = () => {
+    console.log("l");
+    axios
+      .get("/logout")
+      .then((res) => dispatch(setLogOut()))
+      .catch((err) => console.log(err));
+  };
 
   return (
     <Container>
@@ -19,6 +31,7 @@ function Sidebar() {
           style={{
             background: `url(${user?.currentUser.photoURL}) no-repeat center center/cover`,
           }}
+          onClick={() => setShowProfile(true)}
         />
 
         <TopRight>
@@ -32,6 +45,28 @@ function Sidebar() {
             <CreateIcon />
           </div>
         </TopRight>
+
+        {showProfile && (
+          <User>
+            <p>
+              <Close onClick={() => setShowProfile(false)} />
+            </p>
+            <div>
+              <UserProfile
+                style={{
+                  background: `url(${user?.currentUser.photoURL}) no-repeat center center/cover`,
+                }}
+              />
+              <h1>{user?.currentUser.userName}</h1>
+              <h3>{user?.currentUser.emailId}</h3>
+              <button onClick={logout}>
+                <ExitToAppIcon />
+
+                <span>Log out</span>
+              </button>
+            </div>
+          </User>
+        )}
       </Top>
 
       <Search>
@@ -77,10 +112,75 @@ const Top = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 
   h1 {
     font-size: 1.5rem;
   }
+`;
+
+const User = styled.div`
+  position: fixed;
+  width: 90%;
+  max-width: 400px;
+  background: var(--bg);
+  padding: 2rem;
+  height: fit-content;
+  z-index: 10;
+  top: 1%;
+  left: 5%;
+  border-radius: 20px;
+
+  p {
+    text-align: right;
+  }
+
+  div {
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-top: 0.5rem;
+      text-transform: capitalize;
+    }
+
+    h3 {
+      text-align: center;
+      margin: 0.5rem 0;
+      color: #b0b3b8;
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      background: var(--secondary);
+      border-radius: 8px;
+      outline: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      span {
+        margin-left: 1rem;
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+    }
+  }
+`;
+
+const UserProfile = styled(Avatar)`
+  max-width: 120px;
+  height: 120px;
+  margin: 0.5rem auto;
+`;
+
+const Close = styled(CloseOutlined)`
+  cursor: pointer !important;
 `;
 
 const TopRight = styled.div`

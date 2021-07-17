@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Main from "./components/Main";
@@ -12,24 +12,35 @@ import Login from "./components/Login";
 import { selectUser, setLogin } from "./features/users/user";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "./axios";
+import { CircularProgress } from "@material-ui/core";
 
 function App() {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get("/isUser")
-      .then((res) => dispatch(setLogin(res.data)))
-      .catch((err) => err);
+      .then((res) => {
+        setLoading(false);
+        dispatch(setLogin(res.data));
+      })
+      .catch((err) => setLoading(false));
   }, []);
-
-  console.log("user is", user);
 
   return (
     <div className="App">
+      {loading && (
+        <div className="loading">
+          <div className="loading-div">
+            <CircularProgress className="spinner" />
+          </div>
+        </div>
+      )}
       <Router>
         <Switch>
           <Route path="/" exact>
