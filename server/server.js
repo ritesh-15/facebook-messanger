@@ -3,8 +3,12 @@ import cors from "cors";
 import config from "./db.js";
 import router from "./router/web.js";
 import session from "express-session";
+import { Server } from "socket.io";
+import http from "http";
 
 const app = express();
+
+const server = http.createServer(app);
 
 app.use(
   cors({
@@ -30,6 +34,18 @@ config();
 
 app.use(router);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on ${PORT}`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.on("message", (message) => {
+    io.emit("new-message", message);
+  });
 });

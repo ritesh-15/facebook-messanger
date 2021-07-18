@@ -4,9 +4,11 @@ const MessageShcema = mongoose.Schema(
   {
     userName: { type: String, required: true },
     message: { type: String, required: true },
-    profile: { type: String, required: true },
-    userId: { type: String, required: true },
-    userEmail: { type: String, required: true },
+    photoURL: { type: String, required: true },
+    reciverId: { type: String, required: true },
+    senderId: { type: String, required: true },
+    emailId: { type: String, required: true },
+    ids: { type: String, required: true },
   },
   { timestamps: true }
 );

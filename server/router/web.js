@@ -5,6 +5,9 @@ import { v4 as uuid } from "uuid";
 import bcrypt from "bcrypt";
 import path from "path";
 import { fileURLToPath } from "url";
+import Message from "../models/messages.js";
+import Room from "../models/rooms.js";
+import { v4 as uuidV4 } from "uuid";
 
 const __dirname = fileURLToPath(import.meta.url);
 
@@ -15,7 +18,9 @@ const storage = multer.diskStorage({
     cb(null, "uploads");
   },
   filename: (req, file, cb) => {
-    const uniqueFileName = Date.now() + uuid() + file.originalname;
+    const uniqueFileName = `${
+      Date.now() + uuid() + path.extname(file.originalname)
+    }`;
     cb(null, uniqueFileName);
   },
 });
@@ -98,24 +103,23 @@ router.get("/profile/:filename", (req, res) => {
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (!req.body.email || !req.body.password) res.status(400);
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send("No data found");
+  }
 
   User.findOne({ emailId: email }, async (err, result) => {
     if (result) {
-      const auth = await bcrypt.compare(password, result.password);
-
       try {
+        const auth = await bcrypt.compare(password, result.password);
         if (auth) {
           req.session.user = result;
-          res.json({ currentUser: result });
+          res.status(200).json({ currentUser: result });
         }
       } catch (e) {
         res.status(404).json({ error: "Email or password is wrong" });
       }
     }
-
-    res.statusCode = 404;
-    res.send("No user found");
+    res.status(404).json("No user found");
   });
 });
 
@@ -141,8 +145,104 @@ router.get("/check/email/:email", (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-  req.logOut();
-  res.status(200);
+  req.session.user = null;
+  res.status(200).send("Log out");
+});
+
+router.get("/all/rooms", (req, res) => {
+  Room.find((err, result) => {
+    if (err) res.status(500).json({ error: "No data found" });
+    console.log(result);
+    res.status(200).json(result);
+  });
+});
+
+router.get("/get/details/:id", (req, res) => {
+  Room.findOne({ roomId: req.params.id }, (err, result) => {
+    if (err) res.status(404).json("No user found");
+
+    res.status(200).json(result);
+  });
+});
+
+router.post("/new/message", async (req, res) => {
+  const { userName, email, recieverId, senderId, photoURL, message } = req.body;
+
+  if (
+    !userName ||
+    !email ||
+    !recieverId ||
+    !senderId ||
+    !photoURL ||
+    !message
+  ) {
+    res.status(400).json("Bad request");
+  }
+
+  try {
+    const responce = await Message.create({
+      userName: userName,
+      emailId: email,
+      message: message,
+      photoURL: photoURL,
+      reciverId: recieverId,
+      senderId: senderId,
+      ids: senderId + recieverId,
+    });
+
+    if (message) {
+      res.status(201).json({ message: responce._id });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(500);
+  }
+});
+
+router.get("/get/messages/:id/:uid", (req, res) => {
+  Message.find(
+    {
+      $or: [
+        { ids: req.params.id + req.params.uid },
+        { ids: req.params.uid + req.params.id },
+      ],
+    },
+    (err, data) => {
+      if (err) res.status(404);
+
+      res.status(200).json(data);
+    }
+  );
+});
+
+router.post("/new/room", async (req, res) => {
+  const { name, fileName, userId } = req.body;
+
+  if (!name || !fileName || !userId) res.status(400);
+
+  try {
+    const room = await Room.create({
+      roomName: name,
+      roomId: uuidV4(),
+      roomOwner: userId,
+      roomPhotoURL: `http://localhost:9000/profile/${fileName}`,
+    });
+
+    if (room) res.status(201).json(room);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
+  }
+});
+
+router.get("/user/:email", async (req, res) => {
+  try {
+    const user = await User.find({ emailId: req.params.email });
+    if (user) res.status(200).json(user[0]);
+    res.status(404).json("no user found");
+  } catch (e) {
+    res.status(404).json("no user found");
+  }
 });
 
 export default router;
