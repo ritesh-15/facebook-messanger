@@ -4,7 +4,7 @@ import styled from "styled-components";
 function SidebarItem({ img, name, message, active }) {
   return (
     <Container
-      style={active ? { background: "#252F3C" } : { background: "inherit" }}
+      style={active ? { background: "#EAF3FF" } : { background: "inherit" }}
     >
       <Avatar
         style={{
@@ -34,7 +34,7 @@ const Container = styled.div`
   text-overflow: ellipsis;
 
   &:hover {
-    background-color: var(--bg) !important;
+    background: #f0f2f5 !important;
   }
 `;
 

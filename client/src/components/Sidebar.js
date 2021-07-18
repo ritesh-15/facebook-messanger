@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import VideoCallIcon from "@material-ui/icons/VideoCall";
@@ -10,17 +10,36 @@ import { selectUser, setLogOut } from "../features/users/user";
 import { CloseOutlined } from "@material-ui/icons";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import axios from "../axios";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { selectMessages } from "../features/messages/message";
+import Room from "./Room";
 
 function Sidebar() {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const [showProfile, setShowProfile] = useState(false);
+  const [chats, setChats] = useState([]);
+  const history = useHistory();
+  const { id } = useParams();
+  const [room, setRoom] = useState(false);
+
+  console.log(chats);
+
+  useEffect(() => {
+    axios
+      .get("/all/rooms")
+      .then((res) => setChats(res.data))
+      .catch((err) => console.log(err));
+  }, []);
 
   const logout = () => {
-    console.log("l");
     axios
       .get("/logout")
-      .then((res) => dispatch(setLogOut()))
+      .then((res) => {
+        history.push("/login");
+        console.log(res.data);
+        dispatch(setLogOut());
+      })
       .catch((err) => console.log(err));
   };
 
@@ -42,9 +61,11 @@ function Sidebar() {
             <VideoCallIcon />
           </div>
           <div>
-            <CreateIcon />
+            <Create onClick={(e) => setRoom(true)} />
           </div>
         </TopRight>
+
+        {room && <Room setRoom={setRoom} />}
 
         {showProfile && (
           <User>
@@ -74,17 +95,11 @@ function Sidebar() {
         <input type="text" placeholder="Search Messanger" />
       </Search>
       <Items>
-        <SidebarItem
-          img="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-          name="ritesh khore"
-          message="Hi this is first message"
-          active
-        />
-        <SidebarItem
-          img="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
-          name="ritesh khore"
-          message="Hi this is first message"
-        />
+        {chats.map((chat) => (
+          <Link key={chat._id} to={`/chat/${chat.roomId}`}>
+            <SidebarItem img={chat.roomPhotoURL} name={chat.roomName} active />
+          </Link>
+        ))}
       </Items>
     </Container>
   );
@@ -92,11 +107,14 @@ function Sidebar() {
 
 export default Sidebar;
 
+const Create = styled(CreateIcon)``;
+
 const Container = styled.div`
   width: 100%;
   height: 100vh;
   padding: 1rem;
-  border-right: 1px solid #393a3b;
+  max-width: 500px;
+  border-right: 1px solid #e5e5e5;
 `;
 
 const Avatar = styled.div`
@@ -122,14 +140,15 @@ const Top = styled.div`
 const User = styled.div`
   position: fixed;
   width: 90%;
-  max-width: 400px;
-  background: var(--bg);
-  padding: 2rem;
+  max-width: 300px;
+  background: #fdfdfd;
+  padding: 1rem;
   height: fit-content;
   z-index: 10;
-  top: 1%;
+  top: 3%;
   left: 5%;
-  border-radius: 20px;
+  border-radius: 6px;
+  box-shadow: 0 0 30px 10px rgba(0, 0, 0, 0.08);
 
   p {
     text-align: right;
@@ -141,6 +160,7 @@ const User = styled.div`
       font-size: 1.5rem;
       margin-top: 0.5rem;
       text-transform: capitalize;
+      color: #4a4a4a;
     }
 
     h3 {
@@ -154,15 +174,20 @@ const User = styled.div`
       width: 100%;
       padding: 0.6rem 1rem;
       font-size: 1rem;
-      background: var(--secondary);
+      background: transparent;
       border-radius: 8px;
       outline: none;
       border: none;
-      color: #fff;
+      color: #4a4a4a;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 160ms ease-in-out;
+
+      &:hover {
+        background: #f0f2f5;
+      }
 
       span {
         margin-left: 1rem;
@@ -188,7 +213,7 @@ const TopRight = styled.div`
   align-items: center;
 
   div {
-    background: var(--bg);
+    background: #e4e6eb;
     border-radius: 50%;
     margin-right: 0.5rem;
     padding: 0.35rem;
@@ -198,14 +223,14 @@ const TopRight = styled.div`
     transition: all 0.25s ease-in;
 
     &:hover {
-      background: rgba(58, 59, 60, 0.7);
+      opacity: 0.8;
     }
   }
 `;
 
 const Search = styled.div`
   width: 100%;
-  background: var(--bg);
+  background: #e4e6eb;
   padding: 0.5rem;
   margin-top: 1em;
   border-radius: 999px;
@@ -219,7 +244,7 @@ const Search = styled.div`
     outline: none;
     margin-left: 0.5em;
     font-size: 1em;
-    color: #fff;
+    color: #65676b;
   }
 `;
 

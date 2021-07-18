@@ -1,20 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import LocalPhoneIcon from "@material-ui/icons/LocalPhone";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import ErrorIcon from "@material-ui/icons/Error";
+import { useParams } from "react-router-dom";
+import axios from "../axios";
+import { AddOutlined } from "@material-ui/icons";
+import Addmember from "./Addmember";
 
 function MainTop() {
+  const { id } = useParams();
+  const [room, setRoom] = useState();
+  const [add, setAdd] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get(`/get/details/${id}`)
+      .then((res) => setRoom(res.data))
+      .catch((err) => console.log(err));
+  }, [id]);
+
   return (
     <Container>
       <Left>
         <Avatar
           style={{
-            background: `url(https://images.unsplash.com/photo-1601455763557-db1bea8a9a5a?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60) no-repeat center center/cover`,
+            background: `url(${room?.roomPhotoURL}) no-repeat center center/cover`,
           }}
         />
         <Text>
-          <h6>ritesh khore</h6>
+          <h6>{room?.roomName}</h6>
           <p>Active 29 min ago</p>
         </Text>
       </Left>
@@ -35,7 +50,8 @@ function MainTop() {
             fontSize: "1.8rem",
           }}
         />
-        <ErrorIcon
+        <Add
+          onClick={(e) => setAdd(true)}
           style={{
             color: "var(--secondary)",
             marginRight: "0.8rem",
@@ -44,11 +60,14 @@ function MainTop() {
           }}
         />
       </Right>
+      {add && <Addmember setAdd={setAdd} />}
     </Container>
   );
 }
 
 export default MainTop;
+
+const Add = styled(AddOutlined)``;
 
 const Container = styled.div`
   width: 100%;
@@ -56,7 +75,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.5em;
-  border-bottom: 1px solid #393a3b;
+  border-bottom: 1px solid #e5e5e5;
 `;
 
 const Left = styled.div`

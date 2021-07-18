@@ -21,8 +21,8 @@ function Message({ sender, message, profile }) {
       <Content
         style={
           sender
-            ? { background: "var(--secondary)", marginRight: "0.5rem" }
-            : { background: " var(--bg)" }
+            ? { background: "#0084FF", marginRight: "0.5rem", color: "#fff" }
+            : { background: " #f0f2f5" }
         }
       >
         <p>{message}</p>
@@ -47,14 +47,14 @@ const Content = styled.div`
   font-size: 1rem;
   width: fit-content;
   max-width: 500px;
-  background: var(--bg);
+  background: #f0f2f5;
   padding: 0.7em 1em;
   height: 100%;
   margin-left: 0.5em;
+  color: #05054f;
 
   p {
     margin: 0;
-    line-height: 1.5;
   }
 `;
 

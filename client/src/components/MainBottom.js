@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
@@ -6,9 +6,61 @@ import GifIcon from "@material-ui/icons/Gif";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import styled from "styled-components";
 import { SendOutlined } from "@material-ui/icons";
+import { io } from "socket.io-client";
+import { useParams } from "react-router-dom";
+import axios from "../axios";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../features/users/user";
+import { selectMessages, setMessages } from "../features/messages/message";
 
 function MainBottom() {
   const [message, setMessage] = useState("");
+  const [socket, setSocket] = useState();
+  const user = useSelector(selectUser);
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const messages = useSelector(selectMessages);
+
+  useEffect(() => {
+    const socket = io("http://localhost:9000");
+    socket.emit("join-user", id);
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [id]);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (!message) return;
+
+    const data = {
+      userName: user?.currentUser.userName,
+      email: user?.currentUser.emailId,
+      photoURL: user?.currentUser.photoURL,
+      message: message,
+      senderId: user?.currentUser._id,
+      recieverId: id,
+    };
+
+    socket.emit("message", data);
+
+    socket.on("new-message", (message) => {
+      console.log(message);
+      axios
+        .get(`/get/messages/${id}/${user?.currentUser._id}`)
+        .then((res) => dispatch(setMessages(res.data)))
+        .catch((err) => console.log(err));
+    });
+
+    axios
+      .post("/new/message", data)
+      .then((res) => {
+        setMessage("");
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <Container>
@@ -36,6 +88,13 @@ function MainBottom() {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Aa"
         />
+        <button
+          type="submit"
+          style={{ display: "none" }}
+          onClick={(e) => sendMessage(e)}
+        >
+          submit
+        </button>
         <EmojiEmotionsIcon
           style={{
             color: "var(--secondary)",
@@ -55,6 +114,7 @@ function MainBottom() {
             fontSize: "1.5rem",
             marginLeft: "1rem",
           }}
+          onClick={(e) => sendMessage(e)}
         />
       ) : (
         <ThumbUpAltIcon
@@ -86,20 +146,20 @@ const Icons = styled.div`
   align-items: center;
 `;
 
-const Input = styled.div`
+const Input = styled.form`
   display: flex;
   align-items: center;
   flex: 1;
   width: 100%;
-  background: var(--bg);
+  background: #f0f2f5;
   padding: 0.3em 1em;
   border-radius: 999px;
 
   input {
     width: 100%;
     height: 100%;
-    background: transparent;
-    color: #fff;
+    background: #f0f2f5;
+    color: #65676b;
     outline: none;
     border: none;
     resize: none;

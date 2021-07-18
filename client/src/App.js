@@ -13,6 +13,7 @@ import { selectUser, setLogin } from "./features/users/user";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "./axios";
 import { CircularProgress } from "@material-ui/core";
+import Welcome from "./components/Welcome";
 
 function App() {
   const user = useSelector(selectUser);
@@ -44,6 +45,16 @@ function App() {
       <Router>
         <Switch>
           <Route path="/" exact>
+            {user ? (
+              <div className="main">
+                <Sidebar />
+                <Welcome />
+              </div>
+            ) : (
+              <Redirect to="/login" />
+            )}
+          </Route>
+          <Route path="/chat/:id">
             {user ? (
               <div className="main">
                 <Sidebar />
