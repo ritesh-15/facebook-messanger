@@ -7,11 +7,14 @@ import { useParams } from "react-router-dom";
 import axios from "../axios";
 import { AddOutlined } from "@material-ui/icons";
 import Addmember from "./Addmember";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/users/user";
 
 function MainTop() {
   const { id } = useParams();
   const [room, setRoom] = useState();
   const [add, setAdd] = useState(false);
+  const user = useSelector(selectUser);
 
   useEffect(() => {
     axios
@@ -50,17 +53,19 @@ function MainTop() {
             fontSize: "1.8rem",
           }}
         />
-        <Add
-          onClick={(e) => setAdd(true)}
-          style={{
-            color: "var(--secondary)",
-            marginRight: "0.8rem",
-            cursor: "pointer",
-            fontSize: "1.8rem",
-          }}
-        />
+        {user?.currentUser._id === room?.createdId && (
+          <Add
+            onClick={(e) => setAdd(true)}
+            style={{
+              color: "var(--secondary)",
+              marginRight: "0.8rem",
+              cursor: "pointer",
+              fontSize: "1.8rem",
+            }}
+          />
+        )}
       </Right>
-      {add && <Addmember setAdd={setAdd} />}
+      {add && <Addmember setAdd={setAdd} room={room} />}
     </Container>
   );
 }

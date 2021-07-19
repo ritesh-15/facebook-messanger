@@ -31,6 +31,7 @@ function Room({ setRoom }) {
           name: name,
           fileName: res.data.fileName,
           userId: user?.currentUser._id,
+          type: type,
         };
 
         axios

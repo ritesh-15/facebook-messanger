@@ -13,6 +13,7 @@ import axios from "../axios";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { selectMessages } from "../features/messages/message";
 import Room from "./Room";
+import { selectSocket } from "../features/socket/socket";
 
 function Sidebar() {
   const user = useSelector(selectUser);
@@ -22,8 +23,7 @@ function Sidebar() {
   const history = useHistory();
   const { id } = useParams();
   const [room, setRoom] = useState(false);
-
-  console.log(chats);
+  const socket = useSelector(selectSocket);
 
   useEffect(() => {
     axios
@@ -31,6 +31,18 @@ function Sidebar() {
       .then((res) => setChats(res.data))
       .catch((err) => console.log(err));
   }, []);
+
+  socket.on("roomAdded", (room) => {
+    setChats([...chats, room]);
+  });
+
+  socket.on("roomUpdated", (room) => {
+    chats.map((chat) => {
+      if (chat.roomId !== room.roomId) {
+        setChats([...chats, room]);
+      }
+    });
+  });
 
   const logout = () => {
     axios
@@ -41,6 +53,17 @@ function Sidebar() {
         dispatch(setLogOut());
       })
       .catch((err) => console.log(err));
+  };
+
+  const checkRoom = (chat) => {
+    let result;
+    user?.currentUser.rooms.map((room) => {
+      if (room.roomId === chat.roomId) {
+        result = true;
+      }
+    });
+
+    return result;
   };
 
   return (
@@ -95,11 +118,19 @@ function Sidebar() {
         <input type="text" placeholder="Search Messanger" />
       </Search>
       <Items>
-        {chats.map((chat) => (
-          <Link key={chat._id} to={`/chat/${chat.roomId}`}>
-            <SidebarItem img={chat.roomPhotoURL} name={chat.roomName} active />
-          </Link>
-        ))}
+        {chats.map((chat) => {
+          if (
+            chat.type === "public" ||
+            chat.createdId === user?.currentUser._id ||
+            checkRoom(chat)
+          ) {
+            return (
+              <Link key={chat._id} to={`/room/${chat.roomId}`}>
+                <SidebarItem img={chat.roomPhotoURL} name={chat.roomName} />
+              </Link>
+            );
+          }
+        })}
       </Items>
     </Container>
   );
@@ -111,7 +142,7 @@ const Create = styled(CreateIcon)``;
 
 const Container = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 85vh;
   padding: 1rem;
   max-width: 500px;
   border-right: 1px solid #e5e5e5;
@@ -251,7 +282,7 @@ const Search = styled.div`
 const Items = styled.div`
   width: 100%;
   height: 100%;
-  overflow: auto;
+  overflow: scroll;
 
   &::-webkit-scrollbar {
     display: none;

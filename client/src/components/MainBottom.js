@@ -6,30 +6,21 @@ import GifIcon from "@material-ui/icons/Gif";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import styled from "styled-components";
 import { SendOutlined } from "@material-ui/icons";
-import { io } from "socket.io-client";
+
 import { useParams } from "react-router-dom";
 import axios from "../axios";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../features/users/user";
 import { selectMessages, setMessages } from "../features/messages/message";
+import { setSocket, selectSocket } from "../features/socket/socket";
 
 function MainBottom() {
   const [message, setMessage] = useState("");
-  const [socket, setSocket] = useState();
   const user = useSelector(selectUser);
   const { id } = useParams();
   const dispatch = useDispatch();
   const messages = useSelector(selectMessages);
-
-  useEffect(() => {
-    const socket = io("http://localhost:9000");
-    socket.emit("join-user", id);
-    setSocket(socket);
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [id]);
+  const socket = useSelector(selectSocket);
 
   const sendMessage = (e) => {
     e.preventDefault();

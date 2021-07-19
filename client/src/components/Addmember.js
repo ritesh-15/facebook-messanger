@@ -2,10 +2,26 @@ import React, { useState } from "react";
 import axios from "../axios";
 import styled from "styled-components";
 import { CloseOutlined } from "@material-ui/icons";
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/users/user";
 
-function Addmember({ setAdd }) {
+function Addmember({ setAdd, room }) {
   const [user, setUser] = useState();
   const [error, setError] = useState(false);
+  const activeUser = useSelector(selectUser);
+
+  const updateUser = () => {
+    axios
+      .post("/add/user/room", {
+        email: user.emailId,
+        id: room.roomId,
+        name: room.roomName,
+        data: room,
+      })
+      .then((res) => setAdd(false))
+      .catch((err) => console.log(err));
+  };
+
   const checkUser = (e) => {
     if (e.target.value.length > 7) {
       setError(true);
@@ -19,6 +35,21 @@ function Addmember({ setAdd }) {
         })
         .catch((err) => console.log(err));
     }
+  };
+
+  const alreadyAdded = () => {
+    if (user?.rooms.length === 0) return true;
+
+    let done;
+    user.rooms.map((r) => {
+      if (r.roomId !== room.roomId) {
+        done = false;
+      } else {
+        done = true;
+      }
+    });
+
+    return done;
   };
 
   return (
@@ -47,7 +78,12 @@ function Addmember({ setAdd }) {
             <div>
               <h1>{user.userName}</h1>
               <p>{user.emailId}</p>
-              <button>Add</button>
+              {user._id !== activeUser?.currentUser._id && !alreadyAdded() ? (
+                <button onClick={updateUser}>Add</button>
+              ) : (
+                ""
+              )}
+              {alreadyAdded() && <h4>Already in room</h4>}
             </div>
           </User>
         )}
@@ -157,6 +193,7 @@ const User = styled.div`
   margin-bottom: 1rem;
 
   div {
+    text-align: right !important;
     h1,
     p {
       font-size: 1rem;

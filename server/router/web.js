@@ -152,7 +152,7 @@ router.get("/logout", (req, res) => {
 router.get("/all/rooms", (req, res) => {
   Room.find((err, result) => {
     if (err) res.status(500).json({ error: "No data found" });
-    console.log(result);
+
     res.status(200).json(result);
   });
 });
@@ -216,9 +216,9 @@ router.get("/get/messages/:id/:uid", (req, res) => {
 });
 
 router.post("/new/room", async (req, res) => {
-  const { name, fileName, userId } = req.body;
+  const { name, fileName, userId, type } = req.body;
 
-  if (!name || !fileName || !userId) res.status(400);
+  if (!name || !fileName || !userId || !type) res.status(400);
 
   try {
     const room = await Room.create({
@@ -226,9 +226,15 @@ router.post("/new/room", async (req, res) => {
       roomId: uuidV4(),
       roomOwner: userId,
       roomPhotoURL: `http://localhost:9000/profile/${fileName}`,
+      type: type,
+      createdId: userId,
     });
 
-    if (room) res.status(201).json(room);
+    if (room) {
+      res.status(201).json(room);
+      const emmiter = req.app.get("eventEmitter");
+      emmiter.emit("roomAdded", room);
+    }
   } catch (e) {
     console.log(e);
     res.status(500).json(e);
@@ -242,6 +248,37 @@ router.get("/user/:email", async (req, res) => {
     res.status(404).json("no user found");
   } catch (e) {
     res.status(404).json("no user found");
+  }
+});
+
+router.post("/add/user/room", async (req, res) => {
+  try {
+    const updated = await User.updateOne(
+      { emailId: req.body.email },
+      {
+        $addToSet: {
+          rooms: {
+            $each: [
+              {
+                roomName: req.body.name,
+                roomId: req.body.id,
+                joinAt: new Date(),
+              },
+            ],
+          },
+        },
+      }
+    );
+
+    if (updated) {
+      res.status(200).json(updated);
+      const emmiter = req.app.get("eventEmitter");
+      emmiter.emit("roomUpdated", req.body.data);
+    }
+
+    res.status(500).json(updated);
+  } catch (e) {
+    res.status(500).json(e);
   }
 });
 

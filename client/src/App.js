@@ -14,13 +14,26 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "./axios";
 import { CircularProgress } from "@material-ui/core";
 import Welcome from "./components/Welcome";
+import { setSocket, selectSocket } from "./features/socket/socket";
+import { io } from "socket.io-client";
 
 function App() {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const socket = useSelector(selectSocket);
 
   axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    const s = io("http://localhost:9000");
+    s.emit("join-user");
+    dispatch(setSocket(s));
+
+    return () => {
+      s.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +67,7 @@ function App() {
               <Redirect to="/login" />
             )}
           </Route>
-          <Route path="/chat/:id">
+          <Route path="/room/:id">
             {user ? (
               <div className="main">
                 <Sidebar />

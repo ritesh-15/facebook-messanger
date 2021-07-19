@@ -5,7 +5,7 @@ function Welcome() {
   return (
     <Container>
       <Main>
-        <img src="http://assets.stickpng.com/images/580b57fcd9996e24bc43c526.png" />
+        <img src="https://facebookbrand.com/wp-content/uploads/2020/10/Logo_Messenger_NewBlurple-399x399-1.png?w=399&h=399" />
         <h1>Welcome to messanger</h1>
       </Main>
     </Container>

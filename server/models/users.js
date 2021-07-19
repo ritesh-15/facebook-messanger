@@ -8,6 +8,7 @@ const UserSchema = mongoose.Schema(
     photoURL: { type: String, required: true },
     path: { type: String, required: true },
     fileName: { type: String, required: true },
+    rooms: { type: Array, required: true },
   },
   { timestamps: true }
 );

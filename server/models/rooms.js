@@ -10,6 +10,8 @@ const Rooms = mongoose.Schema(
       required: true,
     },
     roomPhotoURL: { type: String, required: true },
+    type: { type: String, required: true },
+    createdId: { type: String, required: true },
   },
   { timestamps: true }
 );
