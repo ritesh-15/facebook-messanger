@@ -49,9 +49,13 @@ const io = new Server(server, {
   },
 });
 
+let roomId;
+
 io.on("connection", (socket) => {
-  socket.on("message", (message) => {
-    io.emit("new-message", message);
+  socket.on("join-room", (id) => {
+    roomId = id;
+    console.log("User connected", id);
+    socket.join(id);
   });
 });
 
@@ -61,4 +65,11 @@ eventEmitter.on("roomAdded", (room) => {
 
 eventEmitter.on("roomUpdated", (room) => {
   io.emit("roomUpdated", room);
+});
+
+eventEmitter.on("newMessage", (message) => {
+  console.log(message);
+  if (roomId) {
+    io.to(roomId).emit("newMessage", message);
+  }
 });

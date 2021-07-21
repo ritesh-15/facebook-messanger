@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import Chat from "./Chat";
 import MainTop from "./MainTop";
 import MainBottom from "./MainBottom";
+import { useParams } from "react-router-dom";
+import { selectSocket } from "../features/socket/socket";
+import { useSelector } from "react-redux";
 
 function Main() {
+  const { id } = useParams();
+  const socket = useSelector(selectSocket);
+
+  useEffect(() => {
+    socket.emit("join-room", id);
+  }, [id]);
+
   return (
     <Container>
       <MainTop />

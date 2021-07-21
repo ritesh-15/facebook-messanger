@@ -103,7 +103,7 @@ router.get("/profile/:filename", (req, res) => {
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  if (!req.body.email || !req.body.password) {
+  if (!email || !password) {
     res.status(400).send("No data found");
   }
 
@@ -114,12 +114,13 @@ router.post("/login", (req, res) => {
         if (auth) {
           req.session.user = result;
           res.status(200).json({ currentUser: result });
+        } else {
+          res.status(404).json({ error: "Email or password is wrong" });
         }
       } catch (e) {
         res.status(404).json({ error: "Email or password is wrong" });
       }
     }
-    res.status(404).json("No user found");
   });
 });
 
@@ -166,7 +167,8 @@ router.get("/get/details/:id", (req, res) => {
 });
 
 router.post("/new/message", async (req, res) => {
-  const { userName, email, recieverId, senderId, photoURL, message } = req.body;
+  const { userName, email, recieverId, senderId, photoURL, message, roomId } =
+    req.body;
 
   if (
     !userName ||
@@ -174,7 +176,8 @@ router.post("/new/message", async (req, res) => {
     !recieverId ||
     !senderId ||
     !photoURL ||
-    !message
+    !message ||
+    !roomId
   ) {
     res.status(400).json("Bad request");
   }
@@ -188,24 +191,23 @@ router.post("/new/message", async (req, res) => {
       reciverId: recieverId,
       senderId: senderId,
       ids: senderId + recieverId,
+      roomId: roomId,
     });
 
-    if (message) {
-      res.status(201).json({ message: responce._id });
+    if (responce) {
+      const emmiter = req.app.get("eventEmitter");
+      emmiter.emit("newMessage", responce);
+      res.status(201).json(responce);
     }
   } catch (e) {
-    console.log(e);
     res.status(500);
   }
 });
 
-router.get("/get/messages/:id/:uid", (req, res) => {
+router.get("/get/messages/:id", (req, res) => {
   Message.find(
     {
-      $or: [
-        { ids: req.params.id + req.params.uid },
-        { ids: req.params.uid + req.params.id },
-      ],
+      roomId: req.params.id,
     },
     (err, data) => {
       if (err) res.status(404);
@@ -231,12 +233,11 @@ router.post("/new/room", async (req, res) => {
     });
 
     if (room) {
-      res.status(201).json(room);
       const emmiter = req.app.get("eventEmitter");
       emmiter.emit("roomAdded", room);
+      res.status(201).json(room);
     }
   } catch (e) {
-    console.log(e);
     res.status(500).json(e);
   }
 });
@@ -271,15 +272,24 @@ router.post("/add/user/room", async (req, res) => {
     );
 
     if (updated) {
-      res.status(200).json(updated);
       const emmiter = req.app.get("eventEmitter");
       emmiter.emit("roomUpdated", req.body.data);
+      res.status(200).json(updated);
     }
-
-    res.status(500).json(updated);
   } catch (e) {
     res.status(500).json(e);
   }
+});
+
+router.get("/update/room/users", (req, res) => {
+  Room.updateOne(
+    { roomId: req.query.roomId },
+    { $inc: { users: 1 } },
+    (err, result) => {
+      if (err) res.status(500).send(err);
+      res.status(200).json(result);
+    }
+  );
 });
 
 export default router;

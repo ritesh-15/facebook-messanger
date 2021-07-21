@@ -9,6 +9,7 @@ const MessageShcema = mongoose.Schema(
     senderId: { type: String, required: true },
     emailId: { type: String, required: true },
     ids: { type: String, required: true },
+    roomId: { type: String, required: true },
   },
   { timestamps: true }
 );

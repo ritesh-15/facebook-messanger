@@ -33,7 +33,7 @@ function MainTop() {
         />
         <Text>
           <h6>{room?.roomName}</h6>
-          <p>Active 29 min ago</p>
+          <p>{room?.users} members</p>
         </Text>
       </Left>
       <Right>

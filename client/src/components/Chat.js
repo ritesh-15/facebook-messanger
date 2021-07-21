@@ -5,21 +5,32 @@ import styled from "styled-components";
 import Message from "./Message";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../features/users/user";
-import { setMessages, selectMessages } from "../features/messages/message";
+import {
+  setMessages,
+  selectMessages,
+  setNewMessage,
+} from "../features/messages/message";
+import { selectSocket } from "../features/socket/socket";
 
 function Chat() {
   const { id } = useParams();
   const [room, setRoom] = useState();
-  const messages = useSelector(selectMessages);
+  const [messages, setMessages] = useState([]);
   const user = useSelector(selectUser);
-  const dispatch = useDispatch();
+  const socket = useSelector(selectSocket);
 
-  // useEffect(() => {
-  //   axios
-  //     .get(`/get/messages/${id}/${user?.currentUser._id}`)
-  //     .then((res) => dispatch(setMessages(res.data)))
-  //     .catch((err) => console.log(err));
-  // }, [id]);
+  useEffect(() => {
+    axios
+      .get(`/get/messages/${id}`)
+      .then((res) => setMessages(res.data))
+      .catch((err) => console.log(err));
+  }, [id]);
+
+  useEffect(() => {
+    socket.on("newMessage", (message) => {
+      setMessages([...messages, message]);
+    });
+  }, [messages]);
 
   useEffect(() => {
     axios
@@ -49,10 +60,21 @@ function Chat() {
         {messages?.map((msg) => {
           if (msg.senderId === user?.currentUser._id) {
             return (
-              <Message message={msg.message} profile={msg.photoURL} sender />
+              <Message
+                key={msg._id}
+                message={msg.message}
+                profile={msg.photoURL}
+                sender
+              />
             );
           } else if (msg.senderId !== user?.currentUser._id) {
-            return <Message message={msg.message} profile={msg.photoURL} />;
+            return (
+              <Message
+                key={msg._id}
+                message={msg.message}
+                profile={msg.photoURL}
+              />
+            );
           }
         })}
       </MessageMain>

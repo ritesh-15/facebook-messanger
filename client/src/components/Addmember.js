@@ -18,7 +18,13 @@ function Addmember({ setAdd, room }) {
         name: room.roomName,
         data: room,
       })
-      .then((res) => setAdd(false))
+      .then((res) => {
+        setAdd(false);
+        axios
+          .get(`/update/room/users?roomId=${room.roomId}`)
+          .then((res) => console.log(res.data))
+          .catch((err) => console.log(err));
+      })
       .catch((err) => console.log(err));
   };
 
@@ -42,7 +48,7 @@ function Addmember({ setAdd, room }) {
 
     let done;
     user.rooms.map((r) => {
-      if (r.roomId !== room.roomId) {
+      if (r.roomId === room.roomId) {
         done = false;
       } else {
         done = true;
@@ -78,12 +84,12 @@ function Addmember({ setAdd, room }) {
             <div>
               <h1>{user.userName}</h1>
               <p>{user.emailId}</p>
-              {user._id !== activeUser?.currentUser._id && !alreadyAdded() ? (
+              {user._id !== activeUser?.currentUser._id && alreadyAdded() ? (
                 <button onClick={updateUser}>Add</button>
               ) : (
                 ""
               )}
-              {alreadyAdded() && <h4>Already in room</h4>}
+              {!alreadyAdded() && <h4>Already in room</h4>}
             </div>
           </User>
         )}

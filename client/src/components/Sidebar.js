@@ -36,20 +36,11 @@ function Sidebar() {
     setChats([...chats, room]);
   });
 
-  socket.on("roomUpdated", (room) => {
-    chats.map((chat) => {
-      if (chat.roomId !== room.roomId) {
-        setChats([...chats, room]);
-      }
-    });
-  });
-
   const logout = () => {
     axios
       .get("/logout")
       .then((res) => {
         history.push("/login");
-        console.log(res.data);
         dispatch(setLogOut());
       })
       .catch((err) => console.log(err));

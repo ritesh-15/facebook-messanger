@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
-import GifIcon from "@material-ui/icons/Gif";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import styled from "styled-components";
 import { SendOutlined } from "@material-ui/icons";
-
 import { useParams } from "react-router-dom";
 import axios from "../axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +19,7 @@ function MainBottom() {
   const dispatch = useDispatch();
   const messages = useSelector(selectMessages);
   const socket = useSelector(selectSocket);
+  const [send, setSend] = useState();
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -33,17 +32,8 @@ function MainBottom() {
       message: message,
       senderId: user?.currentUser._id,
       recieverId: id,
+      roomId: id,
     };
-
-    socket.emit("message", data);
-
-    socket.on("new-message", (message) => {
-      console.log(message);
-      axios
-        .get(`/get/messages/${id}/${user?.currentUser._id}`)
-        .then((res) => dispatch(setMessages(res.data)))
-        .catch((err) => console.log(err));
-    });
 
     axios
       .post("/new/message", data)

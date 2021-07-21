@@ -27,7 +27,6 @@ function App() {
 
   useEffect(() => {
     const s = io("http://localhost:9000");
-    s.emit("join-user");
     dispatch(setSocket(s));
 
     return () => {

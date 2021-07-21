@@ -46,7 +46,7 @@ const Content = styled.div`
   border-radius: 20px;
   font-size: 1rem;
   width: fit-content;
-  max-width: 500px;
+  max-width: 550px;
   background: #f0f2f5;
   padding: 0.7em 1em;
   height: 100%;
