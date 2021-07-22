@@ -33,7 +33,7 @@ function MainTop() {
         />
         <Text>
           <h6>{room?.roomName}</h6>
-          <p>{room?.users} members</p>
+          {room?.users !== 1 && <p>{room?.users} members</p>}
         </Text>
       </Left>
       <Right>
@@ -80,7 +80,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-bottom: 0.5em;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #393a3b;
 `;
 
 const Left = styled.div`

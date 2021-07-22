@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-function Message({ sender, message, profile }) {
+function Message({ sender, message, profile, image }) {
   return (
     <Container
       style={
@@ -22,10 +22,15 @@ function Message({ sender, message, profile }) {
         style={
           sender
             ? { background: "#0084FF", marginRight: "0.5rem", color: "#fff" }
-            : { background: " #f0f2f5" }
+            : { background: " #3a3b3c" }
         }
       >
-        <p>{message}</p>
+        {image && (
+          <div>
+            <img src={image} />
+          </div>
+        )}
+        {message && <p>{message}</p>}
       </Content>
     </Container>
   );
@@ -37,24 +42,40 @@ const Container = styled.div`
   width: 100%;
   display: flex;
   align-items: flex-end;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 `;
 
 const Content = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   border-radius: 20px;
   font-size: 1rem;
   width: fit-content;
-  max-width: 550px;
-  background: #f0f2f5;
-  padding: 0.7em 1em;
+  max-width: 500px;
+  background: #3a3b3c;
   height: 100%;
   margin-left: 0.5em;
-  color: #05054f;
+  color: #e4e6eb;
+  font-weight: 500;
+
+  div {
+    width: 100%;
+    height: 300px;
+    background-color: rgba(0, 0, 0, 0.4);
+    min-width: 500px;
+    border-radius: 20px;
+
+    img {
+      width: 100%;
+      object-fit: cover;
+      height: 300px;
+      border-radius: 20px;
+    }
+  }
 
   p {
-    margin: 0;
+    line-height: 1.5;
+    padding: 0.2rem 1em;
   }
 `;
 

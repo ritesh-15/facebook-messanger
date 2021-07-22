@@ -30,6 +30,15 @@ function Chat() {
     socket.on("newMessage", (message) => {
       setMessages([...messages, message]);
     });
+
+    return () => {
+      socket.off();
+    };
+  }, [messages]);
+
+  useEffect(() => {
+    const container = document.getElementById("message-div");
+    container.scrollTop = container.scrollHeight;
   }, [messages]);
 
   useEffect(() => {
@@ -50,13 +59,13 @@ function Chat() {
           />
           <Text>
             <h6>{room?.roomName}</h6>
-            <p>You are freind on facebook</p>
-            <p>Lives in baramati</p>
+            <p>Created by {room?.roomOwner.userName}</p>
+            <p>Published at {new Date(room?.createdAt).toLocaleDateString()}</p>
           </Text>
         </Center>
       </ChatTop>
 
-      <MessageMain>
+      <MessageMain id="message-div">
         {messages?.map((msg) => {
           if (msg.senderId === user?.currentUser._id) {
             return (
@@ -64,6 +73,7 @@ function Chat() {
                 key={msg._id}
                 message={msg.message}
                 profile={msg.photoURL}
+                image={msg.image}
                 sender
               />
             );
@@ -73,6 +83,7 @@ function Chat() {
                 key={msg._id}
                 message={msg.message}
                 profile={msg.photoURL}
+                image={msg.image}
               />
             );
           }
@@ -121,7 +132,7 @@ const Center = styled.div`
 `;
 
 const Text = styled.div`
-  max-width: 100%;
+  width: 100%;
   text-overflow: ellipsis;
   margin-top: 0.5em;
   line-height: 1.5;

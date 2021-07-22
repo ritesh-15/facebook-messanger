@@ -34,7 +34,7 @@ const Container = styled.div`
   text-overflow: ellipsis;
 
   &:hover {
-    background: #f0f2f5 !important;
+    background: #3a3b3c !important;
   }
 `;
 
@@ -55,6 +55,7 @@ const Text = styled.div`
     font-size: 1rem;
     font-weight: normal;
     text-transform: capitalize;
+    color: #e4e6eb;
   }
 
   p {

@@ -133,10 +133,10 @@ const Create = styled(CreateIcon)``;
 
 const Container = styled.div`
   width: 100%;
-  height: 85vh;
+  height: 100vh;
   padding: 1rem;
   max-width: 500px;
-  border-right: 1px solid #e5e5e5;
+  border-right: 1px solid #393a3b;
 `;
 
 const Avatar = styled.div`
@@ -163,7 +163,7 @@ const User = styled.div`
   position: fixed;
   width: 90%;
   max-width: 300px;
-  background: #fdfdfd;
+  background: #3a3b3c;
   padding: 1rem;
   height: fit-content;
   z-index: 10;
@@ -182,7 +182,7 @@ const User = styled.div`
       font-size: 1.5rem;
       margin-top: 0.5rem;
       text-transform: capitalize;
-      color: #4a4a4a;
+      color: #e4e6de;
     }
 
     h3 {
@@ -235,7 +235,7 @@ const TopRight = styled.div`
   align-items: center;
 
   div {
-    background: #e4e6eb;
+    background: #3a3b3c;
     border-radius: 50%;
     margin-right: 0.5rem;
     padding: 0.35rem;
@@ -252,7 +252,7 @@ const TopRight = styled.div`
 
 const Search = styled.div`
   width: 100%;
-  background: #e4e6eb;
+  background: #3a3b3c;
   padding: 0.5rem;
   margin-top: 1em;
   border-radius: 999px;
@@ -266,13 +266,13 @@ const Search = styled.div`
     outline: none;
     margin-left: 0.5em;
     font-size: 1em;
-    color: #65676b;
+    color: #b0b3b8;
   }
 `;
 
 const Items = styled.div`
   width: 100%;
-  height: 100%;
+  height: 85vh;
   overflow: scroll;
 
   &::-webkit-scrollbar {

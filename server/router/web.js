@@ -158,27 +158,31 @@ router.get("/all/rooms", (req, res) => {
   });
 });
 
-router.get("/get/details/:id", (req, res) => {
-  Room.findOne({ roomId: req.params.id }, (err, result) => {
-    if (err) res.status(404).json("No user found");
+router.get("/get/details/:id", async (req, res) => {
+  const room = await Room.findOne({ roomId: req.params.id }).populate(
+    "roomOwner",
+    "-password"
+  );
 
-    res.status(200).json(result);
-  });
+  if (room) {
+    res.status(200).json(room);
+  }
+  res.status(404);
 });
 
 router.post("/new/message", async (req, res) => {
-  const { userName, email, recieverId, senderId, photoURL, message, roomId } =
-    req.body;
+  const {
+    userName,
+    message,
+    email,
+    recieverId,
+    senderId,
+    photoURL,
+    roomId,
+    image,
+  } = req.body;
 
-  if (
-    !userName ||
-    !email ||
-    !recieverId ||
-    !senderId ||
-    !photoURL ||
-    !message ||
-    !roomId
-  ) {
+  if (!userName || !email || !recieverId || !senderId || !photoURL || !roomId) {
     res.status(400).json("Bad request");
   }
 
@@ -192,6 +196,7 @@ router.post("/new/message", async (req, res) => {
       senderId: senderId,
       ids: senderId + recieverId,
       roomId: roomId,
+      image: image,
     });
 
     if (responce) {
@@ -200,6 +205,7 @@ router.post("/new/message", async (req, res) => {
       res.status(201).json(responce);
     }
   } catch (e) {
+    console.log(e);
     res.status(500);
   }
 });

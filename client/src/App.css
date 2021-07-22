@@ -5,12 +5,12 @@
 }
 
 .App {
-  color: #333333;
+  color: #dadde2;
   width: 100%;
   height: 100vh;
   margin: 0 auto;
   overflow: hidden;
-  background: #ffffff;
+  background: #242526;
 }
 
 .main {
