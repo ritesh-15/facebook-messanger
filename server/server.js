@@ -13,7 +13,10 @@ const server = http.createServer(app);
 
 app.use(
   cors({
-    origin: "https://facebook-mern-messanger.herokuapp.com",
+    origin: [
+      "http://localhost:3000",
+      "https://facebook-mern-messanger.herokuapp.com",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -49,7 +52,10 @@ server.listen(PORT, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "https://facebook-mern-messanger.herokuapp.com",
+    origin: [
+      "http://localhost:3000",
+      "https://facebook-mern-messanger.herokuapp.com",
+    ],
   },
 });
 
