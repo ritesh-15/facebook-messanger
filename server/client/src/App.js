@@ -25,7 +25,7 @@ function App() {
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
-    const s = io("http://localhost:9000");
+    const s = io("https://facebook-mern-messanger.herokuapp.com");
     dispatch(setSocket(s));
 
     return () => {

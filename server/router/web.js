@@ -62,7 +62,7 @@ router.post("/new/user", async (req, res) => {
     userName: userName,
     emailId: email,
     password: hashedPass,
-    photoURL: `http://localhost:9000/profile/${fileName}`,
+    photoURL: `https://facebook-mern-messanger.herokuapp.com/profile/${fileName}`,
     fileName: fileName,
   };
 

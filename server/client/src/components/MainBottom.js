@@ -36,7 +36,7 @@ function MainBottom() {
           senderId: user?.currentUser._id,
           recieverId: id,
           roomId: id,
-          image: `http://localhost:9000/profile/${res.data.fileName}`,
+          image: `https://facebook-mern-messanger.herokuapp.com/profile/${res.data.fileName}`,
         };
 
         axios
