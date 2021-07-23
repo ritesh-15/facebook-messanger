@@ -32,11 +32,11 @@ const upload = multer({ storage: storage }).single("file");
 router.post("/upload/profile", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
-      res.status(500).json({ error: "something went wrong" });
+      res.status(500).json({ error: err });
     }
 
     if (!req.file) {
-      res.status(500).json({ error: "No file found" });
+      res.status(400).json({ error: "No file found" });
     }
 
     res.status(201).json({ fileName: req.file.filename, path: req.file.path });
