@@ -15,7 +15,7 @@ const router = Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.resolve("./uploads"));
+    cb(null, "./uploads");
   },
   filename: (req, file, cb) => {
     const uniqueFileName = `${
