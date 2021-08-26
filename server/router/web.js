@@ -88,6 +88,7 @@ router.get("/profile/:filename", (req, res) => {
 
   res.sendFile(dest, (err, result) => {
     if (err) {
+      console.log(err);
       res.status(404).send("No image found");
     }
 
